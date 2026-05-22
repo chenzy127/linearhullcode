@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdint.h>
 #define ROUND 7
-#define P_number 29 /*指数*/
+#define P_number 29 
 #define K_number 1000
 const int S[16] = { 0xc,0xa,0xd,0x3,0xe,0xb,0xf,0x7,0x8,0x9,0x1,0x5,0x0,0x2,0x4,0x6 };
 const int P[16] = { 0xf,0xc,0xd,0xe,0xa,0x9,0x8,0xb,0x6,0x5,0x4,0x7,0x1,0x2,0x3,0x0 };
@@ -85,14 +85,12 @@ void linear(uint64_t alpha, uint64_t beta)
 	long double bias, BIAS = 0, index;
 	long double c2, C2 = 0, index_c2;
 	srand((unsigned)time(NULL));
-	for (k = 0; k < K_number; k++)/*秘钥数据量*/
+	for (k = 0; k < K_number; k++)/*key*/
 	{
-		//key = ((unsigned long long)rand() << 32) | rand();
 		for (int i = 0; i < 4; i++) {
 			key1 = (key1 << 16) | (rand() & 0xFFFF);
 			key2 = (key2 << 16) | (rand() & 0xFFFF);
 		}
-		//printf("%lld, %llx \n", k, key);
 		for (j = 0; j < 16; j++)
 		{
 			Key1[j] = (key1 >> (60 - 4 * j)) & 0xf;
@@ -100,20 +98,18 @@ void linear(uint64_t alpha, uint64_t beta)
 		}
 		Initialize_key(Key1, Key2);
 		data = 1ULL << P_number;
-		//printf("%llx\n",data);
 		num = 0;
-		for (i = 0; i < data; i++)/*明文数据量*/
+		for (i = 0; i < data; i++)
 		{
 			c = 0;
 			for (int i = 0; i < 4; i++) {
 				m = (m << 16) | (rand() & 0xFFFF);
 			}
-			//printf("%d, %llx \n", i, m);
-			for (j = 0; j < 16; j++)//分解成16个半字节块
+			for (j = 0; j < 16; j++)
 			{
 				P[j] = (m >> (60 - 4 * j)) & 0xf;
 			}
-			for (r = 0; r < ROUND; r++) //加密过程
+			for (r = 0; r < ROUND; r++) 
 			{
 				Round(r, P);
 			}
@@ -128,26 +124,24 @@ void linear(uint64_t alpha, uint64_t beta)
 				num++;
 			}
 		}
-		bias = (double)num / data - 0.5;//偏差
+		bias = (double)num / data - 0.5;//bias
 		index = log2(fabs(bias));
-		c2 = (double)2 * num / data - 1;//相关系数=2*bias
+		c2 = (double)2 * num / data - 1;//cor=2*bias
 		c2 = c2 * c2;
 		index_c2 = log2(fabs(c2));
 		if (k % 100 == 0)
 		{
 			printf("num=%lld\n", num);
-			//printf("bias=%lf\n", bias);
-			//printf("index=%lf\n", index);
 			printf("index_c2=%lf\n", index_c2);
 		}
-		BIAS += fabs(bias);//取绝对值后求平均
+		BIAS += fabs(bias);
 		C2 += fabs(c2);
 	}
 	BIAS = (long double)BIAS / K_number;
 	C2 = (long double)C2 / K_number;
 	printf("BIAS=%lf\n", BIAS);
-	printf("INDEX_BIAS=%lf\n", log2(BIAS));//取绝对值后求平均
-	printf("INDEX_C2=%lf\n", 2 * log2(BIAS) + 2);//取绝对值后求平均
+	printf("INDEX_BIAS=%lf\n", log2(BIAS));
+	printf("INDEX_C2=%lf\n", 2 * log2(BIAS) + 2);
 	printf("C2=%lf\n", C2);
 	printf("INDEX_C2=%lf\n", log2(C2));
 }
@@ -157,7 +151,7 @@ int main()
 {
 	uint64_t alpha, beta;
 	clock_t start = clock();
-	/*线性*/
+
 	//-17.0956,6r
 	/*alpha = 0x0005550000055005;
 	beta  = 0x0005550000000500;
